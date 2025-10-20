@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conducción Transitoria de Calor | Transferencia de Calor I</title>
+    
+    <!-- Tailwind CSS para el diseño -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- KaTeX para renderizar fórmulas matemáticas -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0KOVEMVIARBEGEOOfWpvvsGFsZwlaK2JULdLoCvrHoWirdaivAnmY" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" xintegrity="sha384-+VBxd3r6XgURPiLdVj5d6D0ruHjKABpUBIEbZRgwJbJVpGkZGYJB2ODwQe9wJKvG" crossorigin="anonymous"></script>
+
+    <style>
+        /* Estilos personalizados para complementar Tailwind */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Estilo para la pestaña activa */
+        .tab-active {
+            border-bottom-color: #10B981; /* Verde esmeralda */
+            color: #10B981;
+            font-weight: 600;
+        }
+        /* Ocultar secciones por defecto */
+        .content-section {
+            display: none;
+        }
+        /* Mostrar la sección activa */
+        .content-active {
+            display: block;
+        }
+        /* Estilos para KaTeX */
+        .katex { font-size: 1.1em !important; }
+
+        /* Estilos para el Modal */
+        .modal {
+            display: none; /* Oculto por defecto */
+            position: fixed; 
+            z-index: 50; 
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.6);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 95%;
+            max-width: 1200px;
+            border-radius: 10px;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .modal-tab-content { display: none; }
+        .modal-tab-active { display: block; }
+        .modal-tab-button-active {
+            background-color: #10B981;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Contenedor Principal -->
+    <div class="container mx-auto p-4 md:p-8">
+
+        <!-- Encabezado y Navegación -->
+        <header class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div class="text-center">
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-700">Conducción Transitoria de Calor</h1>
+                <p class="text-lg text-gray-500">Paredes Planas, Cilindros Largos y Esferas</p>
+            </div>
+            <!-- Contenedor de imágenes agregado -->
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <img src="https://github.com/Juansanher25/generalconductransit/blob/main/gettyimages-2025486383-612x612.jpg?raw=true" alt="Pared Plana" class="w-full h-48 object-cover rounded-lg shadow-md" onerror="this.onerror=null;this.src='https://placehold.co/612x612/e2e8f0/4a5568?text=Pared+Plana';">
+                    <p class="text-center text-sm text-gray-500 mt-2">Pared Plana</p>
+                </div>
+                <div>
+                    <img src="https://github.com/Juansanher25/generalconductransit/blob/main/960px-Echantillon_de_soudure_orbitale.jpg?raw=true" alt="Cilindro" class="w-full h-48 object-cover rounded-lg shadow-md" onerror="this.onerror=null;this.src='https://placehold.co/612x612/e2e8f0/4a5568?text=Cilindro';">
+                    <p class="text-center text-sm text-gray-500 mt-2">Cilindro Largo</p>
+                </div>
+                <div>
+                    <img src="https://github.com/Juansanher25/generalconductransit/blob/main/Stainless_steel_sphere,_Millennium_Square,_Sheffield_-_DSC07479.JPG?raw=true" alt="Esfera" class="w-full h-48 object-cover rounded-lg shadow-md" onerror="this.onerror=null;this.src='https://placehold.co/612x612/e2e8f0/4a5568?text=Esfera';">
+                    <p class="text-center text-sm text-gray-500 mt-2">Esfera</p>
+                </div>
+            </div>
+            <nav class="mt-6 border-b-2 border-gray-200">
+                <ul class="flex overflow-x-auto whitespace-nowrap -mb-px md:justify-center md:flex-wrap md:overflow-x-visible">
+                    <li class="mr-2"><a href="#" class="tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" onclick="showTab('portada')">Portada</a></li>
+                    <li class="mr-2"><a href="#" class="tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" onclick="showTab('teoria')">Resumen Teórico</a></li>
+                    <li class="mr-2"><a href="#" class="tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" onclick="showTab('aplicaciones')">Aplicaciones</a></li>
+                    <li class="mr-2"><a href="#" class="tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" onclick="showTab('ejemplos')">Ejemplos Resueltos</a></li>
+                    <li class="mr-2"><a href="#" class="tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" onclick="showTab('ejercicios')">Ejercicios Interactivos</a></li>
+                    <li class="mr-2"><a href="#" class="tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" onclick="openModal()">Tablas y Gráficas</a></li>
+                    <li class="mr-2"><a href="#" class="tab inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300" onclick="showTab('bibliografia')">Bibliografía</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Contenido de las Secciones -->
+        <main>
+            <!-- Sección Portada -->
+            <section id="portada" class="content-section bg-white p-8 rounded-lg shadow-md">
+                <div class="text-center flex flex-col items-center justify-center h-full min-h-[50vh]">
+                    <h2 class="text-4xl font-bold text-emerald-600">Transferencia de Calor I</h2>
+                    <p class="mt-4 text-xl text-gray-600">Ph.D. Juan Sandoval Herrera</p>
+                    <p class="mt-2 text-lg text-gray-500">Universidad de América</p>
+                    <p class="mt-1 text-lg text-gray-500">2025</p>
+                </div>
+            </section>
+
+            <!-- Sección Teoría -->
+            <section id="teoria" class="content-section bg-white p-8 rounded-lg shadow-md space-y-6">
+                <h2 class="text-3xl font-bold border-b-2 border-emerald-500 pb-2 mb-4">Resumen Teórico</h2>
+                
+                <div>
+                    <h3 class="text-2xl font-semibold mb-2">¿Qué es la Conducción Transitoria?</h3>
+                    <p>La conducción de calor transitoria (o no estacionaria) describe la variación de la temperatura en un objeto con respecto al <strong>tiempo</strong> y la <strong>posición</strong>. A diferencia del estado estacionario, donde las temperaturas no cambian con el tiempo, en el estado transitorio las temperaturas evolucionan hasta alcanzar un equilibrio térmico con su entorno. Este proceso es fundamental para entender el calentamiento y enfriamiento de objetos.</p>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-semibold mb-2">Análisis Adimensional: Simplificando el Problema</h3>
+                    <p>Resolver la ecuación diferencial de la conducción transitoria puede ser complejo. Para simplificar, se usan números adimensionales que agrupan varias variables físicas en parámetros únicos, reduciendo un problema de 8 variables a solo 3.</p>
+                    <ul class="list-disc list-inside mt-4 space-y-4">
+                        <li>
+                            <strong>Número de Biot (Bi):</strong> Compara la resistencia a la transferencia de calor por conducción *dentro* del objeto con la resistencia a la convección *en la superficie* del objeto.
+                            $$ Bi = \frac{h L_c}{k} $$
+                            Donde $h$ es el coeficiente de convección, $L_c$ es la longitud característica (L para placa, $r_o$ para cilindro/esfera) y $k$ es la conductividad térmica.
+                            <ul class="list-circle list-inside ml-6 mt-2">
+                                <li><strong>Si $Bi < 0.1$</strong>: La resistencia interna es despreciable. El objeto se calienta o enfría de manera uniforme (Método de Capacidad Agrupada).</li>
+                                <li><strong>Si $Bi > 0.1$</strong>: La resistencia interna es significativa. La temperatura varía considerablemente dentro del objeto, y se requiere un análisis más detallado.</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Número de Fourier (Fo o $\tau$):</strong> Compara el calor conducido a través del objeto con la cantidad de calor almacenado. Representa el tiempo adimensional.
+                            $$ \tau = Fo = \frac{\alpha t}{L_c^2} $$
+                            Donde $\alpha$ es la difusividad térmica, $t$ es el tiempo y $L_c$ es la longitud característica. Un valor alto de $Fo$ indica que el calor ha tenido más tiempo para propagarse a través del cuerpo.
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-2xl font-semibold mb-2">Solución Aproximada de Un Término</h3>
+                    <p>La solución exacta a la ecuación de conducción transitoria es una serie infinita. Sin embargo, para tiempos suficientemente largos (cuando $\tau > 0.2$), los términos de la serie convergen rápidamente y podemos usar una aproximación muy precisa considerando solo el primer término de la serie. Esto simplifica enormemente los cálculos con un error menor al 2%.</p>
+                    <p class="mt-2">La temperatura adimensional en el centro del objeto ($\theta_0$) se calcula como:</p>
+                    $$ \theta_0 = \frac{T_0 - T_\infty}{T_i - T_\infty} = A_1 e^{-\lambda_1^2 \tau} $$
+                    <p class="mt-2">Y la temperatura en cualquier otro punto se relaciona con la del centro:</p>
+                    <ul class="list-disc list-inside mt-2 space-y-2">
+                        <li><strong>Pared Plana:</strong> $\frac{\theta(x,t)}{\theta_0} = \cos\left(\frac{\lambda_1 x}{L}\right)$</li>
+                        <li><strong>Cilindro Largo:</strong> $\frac{\theta(r,t)}{\theta_0} = J_0\left(\frac{\lambda_1 r}{r_o}\right)$</li>
+                        <li><strong>Esfera:</strong> $\frac{\theta(r,t)}{\theta_0} = \frac{\sin\left(\lambda_1 r/r_o\right)}{\lambda_1 r/r_o}$</li>
+                    </ul>
+                    <p class="mt-2">Los coeficientes $\lambda_1$ y $A_1$ dependen únicamente del Número de Biot y la geometría, y se obtienen de tablas estándar.</p>
+                </div>
+            </section>
+
+             <!-- Sección Aplicaciones -->
+            <section id="aplicaciones" class="content-section bg-white p-8 rounded-lg shadow-md">
+                <h2 class="text-3xl font-bold border-b-2 border-emerald-500 pb-2 mb-4">Aplicaciones en la Ingeniería y la Vida Cotidiana</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-emerald-700 mb-2">Tratamientos Térmicos de Metales</h3>
+                        <p>El templado, recocido y revenido de metales como el acero son procesos controlados de calentamiento y enfriamiento para alterar sus propiedades mecánicas (dureza, ductilidad). El análisis transitorio es crucial para predecir la microestructura final, evitando grietas o deformaciones y asegurando la calidad del producto.</p>
+                        <img src="https://github.com/Juansanher25/generalconductransit/blob/main/Stress-relief-annealing.jpg?raw=true" alt="Tratamiento térmico de metales" class="mt-4 rounded-lg shadow-md w-full h-40 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e2e8f0/4a5568?text=Metales';">
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-emerald-700 mb-2">Cocción de Alimentos</h3>
+                        <p>Desde hornear un pastel hasta cocer un huevo o asar una pieza de carne, la cocción es un problema de transferencia de calor transitoria. Es vital saber cuánto tiempo se necesita para que el centro del alimento alcance una temperatura segura y deseada, garantizando tanto la seguridad alimentaria como la calidad gastronómica.</p>
+                        <img src="https://github.com/Juansanher25/generalconductransit/blob/main/220_F_577183975_wDdjT4LgMJlnnbqBz0qGClCpUN7N2NYx.jpg?raw=true" alt="Cocción de alimentos" class="mt-4 rounded-lg shadow-md w-full h-40 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e2e8f0/4a5568?text=Alimentos';">
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-emerald-700 mb-2">Diseño de Motores y Turbinas</h3>
+                        <p>Los componentes de motores de combustión, reactores de aviones y turbinas de generación eléctrica experimentan rápidos cambios de temperatura durante el arranque y apagado. El análisis transitorio permite diseñar componentes que soporten el choque térmico y la fatiga, previniendo fallas catastróficas.</p>
+                        <img src="https://github.com/Juansanher25/generalconductransit/blob/main/Turbina_hidra%C3%BAlica.jpg?raw=true" alt="Turbina" class="mt-4 rounded-lg shadow-md w-full h-40 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e2e8f0/4a5568?text=Turbina';">
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-emerald-700 mb-2">Seguridad en Reactores Nucleares</h3>
+                        <p>En caso de una parada de emergencia de un reactor nuclear, es fundamental predecir cómo se enfriarán las barras de combustible. El análisis transitorio de la disipación del calor residual es vital para garantizar que las temperaturas no alcancen niveles peligrosos que puedan causar una fusión del núcleo.</p>
+                        <img src="https://github.com/Juansanher25/generalconductransit/blob/main/Chooz_Nuclear_Power_Plant-9362.jpg?raw=true" alt="Reactor Nuclear" class="mt-4 rounded-lg shadow-md w-full h-40 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e2e8f0/4a5568?text=Reactor';">
+                    </div>
+                     <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-emerald-700 mb-2">Criopreservación</h3>
+                        <p>El congelamiento de muestras biológicas, como células, tejidos u órganos, para su preservación a largo plazo debe realizarse a una velocidad controlada. Un enfriamiento demasiado rápido o lento puede dañar las estructuras celulares. El análisis transitorio ayuda a diseñar protocolos de congelación óptimos.</p>
+                        <img src="https://github.com/Juansanher25/generalconductransit/blob/main/StorageLN.jpg?raw=true" alt="Criopreservación" class="mt-4 rounded-lg shadow-md w-full h-40 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e2e8f0/4a5568?text=Criopreservación';">
+                    </div>
+                     <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-emerald-700 mb-2">Vulcanización del Caucho</h3>
+                        <p>El proceso de vulcanización, que da al caucho su elasticidad y durabilidad, implica calentar el material con azufre. La distribución de temperatura y el tiempo de calentamiento deben ser precisos para asegurar una vulcanización uniforme en piezas gruesas, como los neumáticos de vehículos.</p>
+                        <img src="https://github.com/Juansanher25/generalconductransit/blob/main/Sulfur_vulcanization.png?raw=true" alt="Vulcanización del caucho" class="mt-4 rounded-lg shadow-md w-full h-40 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/e2e8f0/4a5568?text=Vulcanización';">
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Sección Ejemplos -->
+            <section id="ejemplos" class="content-section bg-white p-8 rounded-lg shadow-md space-y-8">
+                <h2 class="text-3xl font-bold border-b-2 border-emerald-500 pb-2 mb-6">Ejemplos Resueltos Paso a Paso</h2>
+
+                <!-- Ejemplo 1: Esfera -->
+                <div class="border border-gray-200 rounded-lg p-6">
+                    <h3 class="text-2xl font-semibold mb-3">Ejemplo 1: Cocción de un Huevo (Esfera)</h3>
+                    <p class="mb-4">Un huevo, considerado una esfera de 5 cm de diámetro, está inicialmente a 5°C y se sumerge en agua hirviendo a 95°C. Con un coeficiente de convección $h = 1200 \, W/m^2 \cdot °C$, determine cuánto tiempo tardará el centro del huevo en alcanzar 70°C.</p>
+                    <details class="bg-gray-50 p-4 rounded-md">
+                        <summary class="font-semibold cursor-pointer">Ver Solución Paso a Paso</summary>
+                        <div class="mt-4 space-y-4">
+                            <p><strong>Paso 1: Definir Datos y Propiedades.</strong></p>
+                            <ul class="list-disc list-inside ml-4">
+                                <li>Geometría: Esfera, $r_o = 0.025 \, m$</li>
+                                <li>Temperaturas: $T_i = 5°C$, $T_\infty = 95°C$, $T_0 = 70°C$</li>
+                                <li>Convección: $h = 1200 \, W/m^2 \cdot °C$</li>
+                                <li>Propiedades (Agua a $T_{prom} = 37.5°C$): $k = 0.64 \, W/m \cdot °C$, $\alpha = 1.541 \times 10^{-7} \, m^2/s$</li>
+                            </ul>
+                            <p><strong>Paso 2: Calcular el Número de Biot (Bi).</strong></p>
+                            <p>$$ Bi = \frac{h r_o}{k} = \frac{(1200)(0.025)}{0.64} = 46.875 $$</p>
+                            <p>Como $Bi > 0.1$, no se puede usar el método de capacidad agrupada. La temperatura interna varía significativamente.</p>
+                            
+                            <p><strong>Paso 3: Obtener Coeficientes de la Aproximación de un Término.</strong></p>
+                            <p>Para una esfera con $Bi=46.875$, se interpola en la tabla de coeficientes (o se observa que para Bi > 40, los valores son muy estables):</p>
+                            <p>$\lambda_1 \approx 3.077$ y $A_1 \approx 1.9955$</p>
+
+                            <p><strong>Paso 4: Calcular la Temperatura Adimensional y despejar el Número de Fourier ($\tau$).</strong></p>
+                            <p>Se usa la ecuación para la temperatura en el centro:</p>
+                            <p>$$ \theta_0 = \frac{T_0 - T_\infty}{T_i - T_\infty} = \frac{70 - 95}{5 - 95} = \frac{-25}{-90} = 0.2778 $$</p>
+                            <p>$$ \theta_0 = A_1 e^{-\lambda_1^2 \tau} \implies 0.2778 = 1.9955 e^{-(3.077)^2 \tau} $$</p>
+                            <p>Despejando $\tau$:</p>
+                            <p>$$ \tau = -\frac{\ln(0.2778 / 1.9955)}{(3.077)^2} \approx 0.2083 $$</p>
+                            <p>Como $\tau > 0.2$, la aproximación de un término es válida.</p>
+
+                            <p><strong>Paso 5: Calcular el Tiempo Real (t).</strong></p>
+                            <p>$$ t = \frac{\tau r_o^2}{\alpha} = \frac{(0.2083)(0.025)^2}{1.541 \times 10^{-7}} \approx 844.9 \, s $$</p>
+                            <p class="font-bold text-emerald-600">$$ t \approx 14.1 \, \text{minutos} $$</p>
+                        </div>
+                    </details>
+                </div>
+                
+                <!-- Ejemplo 2: Cilindro -->
+                <div class="border border-gray-200 rounded-lg p-6">
+                    <h3 class="text-2xl font-semibold mb-3">Ejemplo 2: Enfriamiento de una Flecha (Cilindro)</h3>
+                    <p class="mb-4">Una flecha cilíndrica larga de acero inoxidable 304 (D=20cm) sale de un horno a 600°C. Se enfría en una cámara a 200°C con $h = 80 \, W/m^2 \cdot °C$. Determine la temperatura en el centro de la flecha después de 45 minutos.</p>
+                     <details class="bg-gray-50 p-4 rounded-md">
+                        <summary class="font-semibold cursor-pointer">Ver Solución Paso a Paso</summary>
+                        <div class="mt-4 space-y-4">
+                            <p><strong>Paso 1: Definir Datos y Propiedades.</strong></p>
+                            <ul class="list-disc list-inside ml-4">
+                                <li>Geometría: Cilindro largo, $r_o = 0.1 \, m$</li>
+                                <li>Temperaturas: $T_i = 600°C$, $T_\infty = 200°C$</li>
+                                <li>Tiempo: $t = 45 \, min = 2700 \, s$</li>
+                                <li>Convección: $h = 80 \, W/m^2 \cdot °C$</li>
+                                <li>Propiedades (Acero 304): $k = 14.9 \, W/m \cdot °C$, $\alpha = 3.95 \times 10^{-6} \, m^2/s$</li>
+                            </ul>
+                            <p><strong>Paso 2: Calcular los Números de Biot (Bi) y Fourier ($\tau$).</strong></p>
+                            <p>$$ Bi = \frac{h r_o}{k} = \frac{(80)(0.1)}{14.9} = 0.537 $$</p>
+                            <p>$$ \tau = \frac{\alpha t}{r_o^2} = \frac{(3.95 \times 10^{-6})(2700)}{(0.1)^2} = 1.0665 $$</p>
+                             <p>Como $\tau > 0.2$, la aproximación de un término es válida.</p>
+                            
+                            <p><strong>Paso 3: Obtener Coeficientes de la Aproximación de un Término.</strong></p>
+                            <p>Para un cilindro con $Bi=0.537$, se interpola en la tabla de coeficientes:</p>
+                            <p>$\lambda_1 \approx 0.970$ y $A_1 \approx 1.122$</p>
+
+                            <p><strong>Paso 4: Calcular la Temperatura en el Centro ($T_0$).</strong></p>
+                            <p>Se usa la ecuación para la temperatura en el centro y se despeja $T_0$:</p>
+                            <p>$$ \theta_0 = \frac{T_0 - T_\infty}{T_i - T_\infty} = A_1 e^{-\lambda_1^2 \tau} $$</p>
+                            <p>$$ T_0 = T_\infty + (T_i - T_\infty) \left( A_1 e^{-\lambda_1^2 \tau} \right) $$</p>
+                            <p>$$ T_0 = 200 + (600 - 200) \left( 1.122 e^{-(0.970)^2 (1.0665)} \right) $$</p>
+                            <p>$$ T_0 = 200 + 400 \left( 1.122 \times e^{-1.001} \right) = 200 + 400 (0.412) $$</p>
+                            <p class="font-bold text-emerald-600">$$ T_0 \approx 364.8 \, °C $$</p>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- Ejemplo 3: Pared Plana -->
+                <div class="border border-gray-200 rounded-lg p-6">
+                    <h3 class="text-2xl font-semibold mb-3">Ejemplo 3: Calentamiento de una Placa (Pared Plana)</h3>
+                    <p class="mb-4">Placas grandes de latón de 4 cm de espesor, inicialmente a 20°C, pasan por un horno a 500°C durante 7 minutos. Si $h = 120 \, W/m^2 \cdot °C$, determine la temperatura superficial de las placas al salir.</p>
+                    <details class="bg-gray-50 p-4 rounded-md">
+                        <summary class="font-semibold cursor-pointer">Ver Solución Paso a Paso</summary>
+                         <div class="mt-4 space-y-4">
+                            <p><strong>Paso 1: Definir Datos y Propiedades.</strong></p>
+                            <ul class="list-disc list-inside ml-4">
+                                <li>Geometría: Pared Plana, $2L = 0.04 \, m \implies L=0.02 \, m$</li>
+                                <li>Temperaturas: $T_i = 20°C$, $T_\infty = 500°C$</li>
+                                <li>Tiempo: $t = 7 \, min = 420 \, s$</li>
+                                <li>Convección: $h = 120 \, W/m^2 \cdot °C$</li>
+                                <li>Propiedades (Latón): $k = 110 \, W/m \cdot °C$, $\alpha = 33.9 \times 10^{-6} \, m^2/s$</li>
+                            </ul>
+                             <p><strong>Paso 2: Calcular el Número de Biot (Bi).</strong></p>
+                             <p>$$ Bi = \frac{h L}{k} = \frac{(120)(0.02)}{110} = 0.0218 $$</p>
+                             <p>Como $Bi < 0.1$, el método de capacidad agrupada sería aplicable y daría un resultado muy cercano. Sin embargo, resolveremos con el método de un término para demostrarlo.</p>
+
+                            <p><strong>Paso 3: Calcular el Número de Fourier ($\tau$).</strong></p>
+                            <p>$$ \tau = \frac{\alpha t}{L^2} = \frac{(33.9 \times 10^{-6})(420)}{(0.02)^2} = 35.6 $$</p>
+                             <p>Como $\tau > 0.2$, la aproximación de un término es válida.</p>
+                            
+                            <p><strong>Paso 4: Obtener Coeficientes y Calcular Temperatura en el Centro ($T_0$).</strong></p>
+                            <p>Para una pared plana con $Bi=0.0218$, interpolamos:</p>
+                            <p>$\lambda_1 \approx 0.146$ y $A_1 \approx 1.0036$</p>
+                            <p>$$ T_0 = T_\infty + (T_i - T_\infty) \left( A_1 e^{-\lambda_1^2 \tau} \right) $$</p>
+                            <p>$$ T_0 = 500 + (20 - 500) \left( 1.0036 e^{-(0.146)^2 (35.6)} \right) = 500 - 480 (0.468) \approx 275.4 \, °C $$</p>
+
+                            <p><strong>Paso 5: Calcular la Temperatura en la Superficie ($T_s$ en $x=L$).</strong></p>
+                            <p>Usamos la relación entre la temperatura de la superficie y la del centro:</p>
+                             <p>$$ \frac{T_s - T_\infty}{T_0 - T_\infty} = \cos\left(\frac{\lambda_1 L}{L}\right) = \cos(\lambda_1) $$</p>
+                             <p>$$ T_s = T_\infty + (T_0 - T_\infty) \cos(\lambda_1) $$</p>
+                             <p>$$ T_s = 500 + (275.4 - 500) \cos(0.146) = 500 - 224.6 (0.9894) $$</p>
+                             <p class="font-bold text-emerald-600">$$ T_s \approx 277.8 \, °C $$</p>
+                             <p class="text-sm italic">Nota: El resultado es muy cercano a la temperatura del centro, como se esperaba para un $Bi$ bajo.</p>
+                        </div>
+                    </details>
+                </div>
+
+            </section>
+            
+            <!-- Sección Ejercicios -->
+            <section id="ejercicios" class="content-section bg-white p-8 rounded-lg shadow-md">
+                 <h2 class="text-3xl font-bold border-b-2 border-emerald-500 pb-2 mb-4">Ejercicios Interactivos</h2>
+                 <p class="mb-6">Pon a prueba tus conocimientos. Los valores de los problemas cambian cada vez que presionas "Generar Nuevo Problema".</p>
+                 
+                 <div class="flex justify-center mb-8">
+                     <button id="generate-problem-btn" class="bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-emerald-700 transition duration-300">Generar Nuevo Problema</button>
+                 </div>
+
+                 <div id="problems-container" class="space-y-8">
+                     <!-- Los problemas generados por JS se insertarán aquí -->
+                 </div>
+            </section>
+
+            <!-- Sección Bibliografía -->
+            <section id="bibliografia" class="content-section bg-white p-8 rounded-lg shadow-md">
+                <h2 class="text-3xl font-bold border-b-2 border-emerald-500 pb-2 mb-4">Bibliografía</h2>
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <p class="font-mono text-lg">
+                        Cengel, Y. A., & Ghajar, A. J. (2011). <em>Transferencia de calor y masa: Fundamentos y aplicaciones</em> (4.ª ed.). McGraw-Hill.
+                    </p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Ventana Modal para Tablas y Gráficas -->
+    <div id="data-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">Recursos Adicionales</h2>
+            
+            <div class="border-b border-gray-200">
+                <nav class="flex space-x-4" aria-label="Tabs">
+                    <button class="modal-tab-button py-2 px-4 font-medium text-sm rounded-t-lg" onclick="showModalTab('coeffs')">Coeficientes A1 y λ1</button>
+                    <button class="modal-tab-button py-2 px-4 font-medium text-sm rounded-t-lg" onclick="showModalTab('bessel')">Funciones de Bessel</button>
+                    <button class="modal-tab-button py-2 px-4 font-medium text-sm rounded-t-lg" onclick="showModalTab('heisler')">Gráficas de Heisler</button>
+                </nav>
+            </div>
+
+            <div id="coeffs" class="modal-tab-content pt-4">
+                <h3 class="text-xl font-semibold mb-2">Tabla de Coeficientes ($A_1, \lambda_1$) para Aproximación de un Término</h3>
+                <div class="overflow-x-auto">
+                    <img src="https://github.com/Juansanher25/generalconductransit/blob/main/Coefficientes%20A1%20L1.png?raw=true" alt="Tabla de coeficientes A1 y lambda1" class="max-w-full h-auto mx-auto">
+                </div>
+                <p class="text-xs text-center mt-2">Fuente: Cengel, Y. A., & Ghajar, A. J. (2011).</p>
+            </div>
+
+            <div id="bessel" class="modal-tab-content pt-4">
+                <h3 class="text-xl font-semibold mb-2">Tabla de Funciones de Bessel de Primera Especie ($J_0, J_1$)</h3>
+                 <div class="overflow-x-auto">
+                    <img src="https://i.imgur.com/W2C4s0V.png" alt="Tabla de funciones de Bessel" class="max-w-xs h-auto mx-auto">
+                 </div>
+                 <p class="text-xs text-center mt-2">Fuente: Cengel, Y. A., & Ghajar, A. J. (2011).</p>
+            </div>
+
+            <div id="heisler" class="modal-tab-content pt-4">
+                <h3 class="text-xl font-semibold mb-2">Gráficas de Temperatura Transitoria (Heisler)</h3>
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="font-bold text-center">Pared Plana</h4>
+                        <img src="https://github.com/Juansanher25/generalconductransit/blob/main/Diagrama%20de%20Heislee%20Placa.jpg?raw=true" alt="Gráfica de Heisler para pared plana 1" class="max-w-full h-auto mx-auto border mb-4">
+                        <img src="https://github.com/Juansanher25/generalconductransit/blob/main/Diagrama%20de%20Heislee%20Placa%202.jpg?raw=true" alt="Gráfica de Heisler para pared plana 2" class="max-w-full h-auto mx-auto border">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-center">Cilindro Largo</h4>
+                        <img src="https://github.com/Juansanher25/generalconductransit/blob/main/Diagrama%20de%20Heislee%20Cilindro%201.jpg?raw=true" alt="Gráfica de Heisler para cilindro 1" class="max-w-full h-auto mx-auto border mb-4">
+                        <img src="https://github.com/Juansanher25/generalconductransit/blob/main/Diagrama%20de%20Heislee%20Cilindro%202.jpg?raw=true" alt="Gráfica de Heisler para cilindro 2" class="max-w-full h-auto mx-auto border">
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-center">Esfera</h4>
+                        <img src="https://github.com/Juansanher25/generalconductransit/blob/main/Diagrama%20de%20Heislee%20Esfera%201.jpg?raw=true" alt="Gráfica de Heisler para esfera 1" class="max-w-full h-auto mx-auto border mb-4">
+                        <img src="https://github.com/Juansanher25/generalconductransit/blob/main/Diagrama%20de%20Heislee%20Esfera%202.jpg?raw=true" alt="Gráfica de Heisler para esfera 2" class="max-w-full h-auto mx-auto border">
+                    </div>
+                </div>
+                 <p class="text-xs text-center mt-2">Fuente: Heisler, M. P. (1947) y Gröber, H., et al.</p>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- RENDERIZADO DE FÓRMULAS ---
+            const renderMath = () => {
+                if (typeof renderMathInElement === "function") {
+                    renderMathInElement(document.body, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false}
+                        ]
+                    });
+                }
+            };
+
+            // --- NAVEGACIÓN POR PESTAÑAS ---
+            window.showTab = function(tabId) {
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.remove('content-active');
+                });
+                document.querySelectorAll('header nav a').forEach(tab => {
+                    tab.classList.remove('tab-active');
+                });
+                document.getElementById(tabId).classList.add('content-active');
+                const activeTab = document.querySelector(`a[onclick="showTab('${tabId}')"]`);
+                if(activeTab) activeTab.classList.add('tab-active');
+            }
+            
+            // --- LÓGICA DE EJERCICIOS INTERACTIVOS ---
+            const generateBtn = document.getElementById('generate-problem-btn');
+            const problemsContainer = document.getElementById('problems-container');
+
+            const materials = {
+                'Acero Inoxidable (304)': { k: 14.9, alpha: 3.95e-6 },
+                'Latón': { k: 110, alpha: 33.9e-6 },
+                'Agua (Huevo)': { k: 0.64, alpha: 1.541e-7 },
+                'Aluminio': { k: 237, alpha: 97.1e-6 },
+                'Vidrio': { k: 1.4, alpha: 0.58e-6 },
+            };
+            
+            const coeffsTable = [
+                [0.01, 0.0998, 1.0017, 0.1412, 1.0025, 0.173, 1.003],
+                [0.1, 0.3111, 1.0161, 0.4417, 1.0246, 0.5423, 1.0298],
+                [0.5, 0.6533, 1.0701, 0.9408, 1.1143, 1.1656, 1.1441],
+                [1.0, 0.8603, 1.1191, 1.2558, 1.2071, 1.5708, 1.2732],
+                [2.0, 1.0769, 1.1785, 1.5995, 1.3384, 2.0288, 1.4793],
+                [5.0, 1.3138, 1.2403, 1.9898, 1.5029, 2.5704, 1.787],
+                [10.0, 1.4289, 1.262, 2.1795, 1.5677, 2.8363, 1.9249],
+                [50.0, 1.54, 1.2727, 2.3572, 1.6002, 3.0788, 1.9962],
+                [100.0, 1.5552, 1.2731, 2.3809, 1.6015, 3.1102, 1.999]
+            ];
+
+            function interpolateCoeffs(bi, geom) {
+                let colIndex;
+                if (geom === 'Pared Plana') colIndex = 1;
+                if (geom === 'Cilindro Largo') colIndex = 3;
+                if (geom === 'Esfera') colIndex = 5;
+
+                if (bi <= coeffsTable[0][0]) {
+                    const [, ...vals_low] = coeffsTable[0];
+                    return { lambda1: vals_low[colIndex - 1], A1: vals_low[colIndex] };
+                }
+                if (bi >= coeffsTable[coeffsTable.length - 1][0]) {
+                    const lastRow = coeffsTable[coeffsTable.length - 1];
+                    return { lambda1: lastRow[colIndex], A1: lastRow[colIndex+1] };
+                }
+
+                for (let i = 0; i < coeffsTable.length - 1; i++) {
+                    const [bi_low, ...vals_low] = coeffsTable[i];
+                    const [bi_high, ...vals_high] = coeffsTable[i+1];
+
+                    if (bi >= bi_low && bi <= bi_high) {
+                        const t = (bi - bi_low) / (bi_high - bi_low);
+                        const lambda1 = vals_low[colIndex - 1] * (1 - t) + vals_high[colIndex - 1] * t;
+                        const A1 = vals_low[colIndex] * (1 - t) + vals_high[colIndex] * t;
+                        return { lambda1, A1 };
+                    }
+                }
+                 return { lambda1: 0, A1: 0 }; // Fallback
+            }
+
+            function generateProblem(problemNumber) {
+                const geometries = ['Pared Plana', 'Cilindro Largo', 'Esfera'];
+                const materialKeys = Object.keys(materials);
+                const geometry = geometries[Math.floor(Math.random() * geometries.length)];
+                const materialName = materialKeys[Math.floor(Math.random() * materialKeys.length)];
+                const material = materials[materialName];
+                const Lc = Math.round((Math.random() * 8 + 2)) / 100;
+                const Ti = Math.round(Math.random() * 40 + 10);
+                const Tinf = Math.round(Math.random() * 400 + 100);
+                const h = Math.round(Math.random() * 1000 + 50);
+                const t = Math.round(Math.random() * 55 + 5);
+                const t_sec = t * 60;
+                const Bi = (h * Lc) / material.k;
+                const tau = (material.alpha * t_sec) / (Lc ** 2);
+                const coeffs = interpolateCoeffs(Bi, geometry);
+                const theta0 = coeffs.A1 * Math.exp(-(coeffs.lambda1 ** 2) * tau);
+                const T0 = Tinf + theta0 * (Ti - Tinf);
+
+                return `
+                    <div class="border border-gray-200 rounded-lg p-6">
+                        <h3 class="text-2xl font-semibold mb-3">Problema ${problemNumber}</h3>
+                        <div class="mb-4 space-y-2">
+                            <p>Se está ${Ti < Tinf ? 'calentando' : 'enfriando'} un objeto de <strong>${materialName}</strong> con forma de <strong>${geometry}</strong>.</p>
+                            <p>La dimensión característica (${geometry === 'Pared Plana' ? 'L' : 'r_o'}) es de <strong>${(Lc*100).toFixed(1)} cm</strong>.</p>
+                            <p>Inicialmente, el objeto se encuentra a una temperatura uniforme de <strong>${Ti}°C</strong>.</p>
+                            <p>Se introduce en un ambiente a <strong>${Tinf}°C</strong> con un coeficiente de transferencia de calor por convección de <strong>${h} W/m²·K</strong>.</p>
+                            <p class="font-bold">Determine la temperatura en el centro del objeto después de <strong>${t} minutos</strong>.</p>
+                        </div>
+                        <details class="bg-gray-50 p-4 rounded-md" ontoggle="renderMath()">
+                            <summary class="font-semibold cursor-pointer">Ver Solución Paso a Paso</summary>
+                            <div class="mt-4 space-y-4">
+                                <p><strong>Paso 1: Datos y Propiedades.</strong></p>
+                                <ul class="list-disc list-inside ml-4">
+                                    <li>Geometría: ${geometry}, $L_c = ${Lc.toFixed(3)} \, m$</li>
+                                    <li>Temperaturas: $T_i = ${Ti}°C$, $T_\\infty = ${Tinf}°C$</li>
+                                    <li>Tiempo: $t = ${t} \, min = ${t_sec} \, s$</li>
+                                    <li>Propiedades (${materialName}): $k = ${material.k}$, $\\alpha = ${material.alpha.toExponential(3)}$</li>
+                                </ul>
+                                <p><strong>Paso 2: Calcular Números Adimensionales.</strong></p>
+                                <p>$$ Bi = \\frac{h L_c}{k} = \\frac{(${h})(${Lc.toFixed(3)})}{${material.k}} = ${Bi.toFixed(3)} $$</p>
+                                <p>$$ \\tau = \\frac{\\alpha t}{L_c^2} = \\frac{(${material.alpha.toExponential(3)})(${t_sec})}{(${Lc.toFixed(3)})^2} = ${tau.toFixed(3)} $$</p>
+                                ${tau > 0.2 ? '<p class="text-sm text-green-600">Como $\\tau > 0.2$, la aproximación de un término es válida.</p>' : '<p class="text-sm text-red-600">Atención: $\\tau < 0.2$, la aproximación de un término puede tener un error significativo.</p>'}
+                                
+                                <p><strong>Paso 3: Obtener Coeficientes.</strong></p>
+                                <p>Para ${geometry} con $Bi=${Bi.toFixed(3)}$, los coeficientes son:</p>
+                                <p>$\\lambda_1 \\approx ${coeffs.lambda1.toFixed(4)}$ y $A_1 \\approx ${coeffs.A1.toFixed(4)}$</p>
+
+                                <p><strong>Paso 4: Calcular Temperatura en el Centro ($T_0$).</strong></p>
+                                <p>$$ \\frac{T_0 - T_\\infty}{T_i - T_\\infty} = A_1 e^{-\\lambda_1^2 \\tau} $$</p>
+                                <p>$$ T_0 = ${Tinf} + (${Ti} - ${Tinf}) \\left( ${coeffs.A1.toFixed(4)} e^{-(${coeffs.lambda1.toFixed(4)})^2 (${tau.toFixed(3)})} \\right) $$</p>
+                                <p class="font-bold text-emerald-600">$$ T_0 \\approx ${T0.toFixed(1)} \, °C $$</p>
+                            </div>
+                        </details>
+                    </div>
+                `;
+            }
+
+            function displayNewProblems() {
+                problemsContainer.innerHTML = generateProblem(1) + generateProblem(2);
+                renderMath();
+            }
+            
+            generateBtn.addEventListener('click', displayNewProblems);
+
+            // --- LÓGICA DEL MODAL ---
+            const modal = document.getElementById('data-modal');
+            
+            window.openModal = function() {
+                modal.style.display = 'block';
+                showModalTab('coeffs');
+            }
+            window.closeModal = function() {
+                modal.style.display = 'none';
+            }
+            window.showModalTab = function(tabId) {
+                document.querySelectorAll('.modal-tab-content').forEach(tab => tab.classList.remove('modal-tab-active'));
+                document.getElementById(tabId).classList.add('modal-tab-active');
+                
+                document.querySelectorAll('.modal-tab-button').forEach(btn => btn.classList.remove('modal-tab-button-active'));
+                document.querySelector(`button[onclick="showModalTab('${tabId}')"]`).classList.add('modal-tab-button-active');
+            }
+
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    closeModal();
+                }
+            }
+
+            // --- INICIALIZACIÓN ---
+            showTab('portada');
+            displayNewProblems();
+            renderMath();
+        });
+    </script>
+</body>
+</html>
+
